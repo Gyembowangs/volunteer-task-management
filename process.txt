@@ -1,0 +1,5 @@
+install dotenv for environment setup -
+
+Include env variabke in the .env file
+
+neon connection string - postgresql://neondb_owner:npg_W3VJpybClgz7@ep-flat-sun-a1mk5ix9-pooler.ap-southeast-1.aws.neon.tech/task-mng?sslmode=require
