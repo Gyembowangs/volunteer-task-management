@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Volunteer Details</title>
+  <link rel="stylesheet" href="/css/volunteerdetail.css" />
+</head>
+<body>
+  <%- include('components/header') %>
+
+  <div class="container">
+    <h1>Volunteer Details for <%= task.title %></h1>
+    <div class="actions">
+      <div class="actions-left">
+        <button class="btn btn-back"><a href="/admin/dashboard">Back</a></button>
+      </div>
+      <div class="actions-right">
+        <button class="btn btn-download"><a href="/admin/volunteers/<%= task.id %>/download">Download CSV</a></button>
+      </div>
+  </div>
+
+    <% if (task.Volunteers && task.Volunteers.length > 0) { %>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Course</th>
+            <th>Year</th>
+            <th>Phone</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% task.Volunteers.forEach(volunteer => { %>
+            <tr>
+              <td><%= volunteer.name %></td>
+              <td><%= volunteer.course %></td>
+              <td><%= volunteer.year %></td>
+              <td><%= volunteer.phone %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p class="no-volunteers">No volunteers have signed up yet for this task.</p>
+    <% } %>
+  </div>
+
+  <%- include('components/footer') %>
+</body>
+</html>

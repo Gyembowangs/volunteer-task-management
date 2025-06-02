@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Volunteer Dashboard</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body>
+  <%- include('components/header') %>
+
+  <div class="dashboard-container">
+    <h2>Your Dashboard</h2>
+
+    <% if (tasks && tasks.length > 0) { %>
+      <% tasks.forEach((task, index) => { %>
+        <div class="task-card">
+          <h3><%= task.title %></h3>
+
+          <div class="task-content">
+            <p><strong>Task Description:</strong> <%= task.description %></p>
+            <hr />
+            <div class="task-details">
+              <p><strong>Location:</strong> <%= task.location %></p>
+              <p><strong>Date:</strong> <%= new Date(task.date).toLocaleDateString() %></p>
+              <p><strong>Required:</strong> <%= task.currentVolunteers %> / <%= task.requiredVolunteers %></p>
+            </div>
+            <br />
+
+            <% if (task.currentVolunteers >= task.requiredVolunteers) { %>
+              <p class="closed-message">Applications Closed</p>
+            <% } else if (task.hasApplied) { %>
+              <p class="applied-message">You have already applied for this task</p>
+            <% } else { %>
+              <button class="apply-btn" data-index="<%= index %>" aria-haspopup="dialog" aria-controls="modal-<%= index %>">
+                Apply to Volunteer
+              </button>
+
+              <!-- Modal Form -->
+              <div class="modal-background" id="modal-<%= index %>" aria-hidden="true" role="dialog" aria-modal="true">
+                <div class="modal-card" onclick="event.stopPropagation();">
+                  <div class="modal-header">
+                    <h4>Apply to Volunteer</h4>
+                  </div>
+
+                  <form action="/apply/<%= task.id %>" method="POST" class="volunteer-form" novalidate>
+                    <div class="form-group">
+                      <label for="name-<%= index %>">Name</label>
+                      <input
+                        type="text"
+                        id="name-<%= index %>"
+                        name="name"
+                        required
+                        value="<%= user ? user.name : '' %>"
+                        readonly
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="course-<%= index %>">Course</label>
+                      <select id="course-<%= index %>" name="course" required>
+                        <option value="" disabled selected>Select a course</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Chemistry">Chemistry</option>
+                        <option value="Life Science">Life Science</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="EPS">EPS</option>
+                        <option value="DSDA">DSDA</option>
+                        <option value="DCPM">DCPM</option>
+                        <option value="New Programme">New Programme</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="year-<%= index %>">Year</label>
+                      <select id="year-<%= index %>" name="year" required>
+                        <option value="" disabled selected>Select Year</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label for="phone-<%= index %>">Phone</label>
+                      <input type="tel" id="phone-<%= index %>" name="phone" required pattern="[0-9+\\- ]+" />
+                    </div>
+
+                    <div class="modal-btns">
+                      <button type="button" class="cancel-btn" data-index="<%= index %>">Cancel</button>
+                      <button type="submit" class="submit-btn">Submit</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p class="no-tasks">No tasks available at the moment.</p>
+    <% } %>
+  </div>
+
+  <%- include('components/footer') %>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const applyButtons = document.querySelectorAll('.apply-btn');
+      const cancelButtons = document.querySelectorAll('.cancel-btn');
+
+      applyButtons.forEach(button => {
+        const index = button.dataset.index;
+        button.addEventListener('click', () => {
+          const modal = document.getElementById(`modal-${index}`);
+          modal.classList.add('show');
+          modal.setAttribute('aria-hidden', 'false');
+        });
+      });
+
+      cancelButtons.forEach(button => {
+        const index = button.dataset.index;
+        button.addEventListener('click', () => {
+          const modal = document.getElementById(`modal-${index}`);
+          modal.classList.remove('show');
+          modal.setAttribute('aria-hidden', 'true');
+        });
+      });
+
+      document.querySelectorAll('.modal-background').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
