@@ -82,8 +82,7 @@ const sequelize = require("./config/database");
 // ✅ Load all models and their associations BEFORE sync
 require("./models"); // this will auto-load User, Task, Volunteer, and define relations
 
-sequelize
-  .sync({ force: false })
+sequelize.sync({ force: false })
   .then(() => {
     console.log("✅ Database synchronized!");
     // Start server inside .then to ensure DB is ready
@@ -91,7 +90,8 @@ sequelize
     app.listen(PORT, () => {
       console.log(`✅ Server running at http://localhost:${PORT}`);
     });
-
+  })
   .catch((error) => {
     console.log("❌ Error syncing the database:", error);
   });
+
