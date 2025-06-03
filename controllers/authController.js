@@ -95,11 +95,18 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Admin login
+    // Admin login check
     if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
       req.session.isAdmin = true;
       req.session.user = { email, name: 'Admin' };
-      return res.redirect('/admin-dashboard');
+
+      return req.session.save(err => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.render('login', { error: 'Session error, please try again.' });
+        }
+        res.redirect('/admin-dashboard');
+      });
     }
 
     // Regular user login
@@ -119,9 +126,18 @@ exports.login = async (req, res) => {
       return res.render('login', { error: 'Invalid credentials' });
     }
 
+    // Set session info for authenticated user
     req.session.isAdmin = false;
-    req.session.user = user;
-    res.redirect('/dashboard');
+    req.session.user = { id: user.id, email: user.email, name: user.name };
+
+    // Save session before redirecting
+    req.session.save(err => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.render('login', { error: 'Session error, please try again.' });
+      }
+      res.redirect('/dashboard');
+    });
 
   } catch (err) {
     console.error('Login error:', err);
