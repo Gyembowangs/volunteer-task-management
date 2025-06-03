@@ -1,6 +1,6 @@
 const express = require("express");
 const session = require("express-session");
-const SequelizeStore = require("connect-session-sequelize")(session.Store);
+const SequelizeStore = require("connect-session-sequelize").default; // v7+ requires `.default`
 const dotenv = require("dotenv");
 const path = require("path");
 
@@ -34,8 +34,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      secure: process.env.NODE_ENV === "production", // Set secure cookie in production
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
       sameSite: "lax",
     },
   })
@@ -81,29 +81,29 @@ app.get("/admin-dashboard", (req, res) => {
   res.redirect("/admin/dashboard");
 });
 
+// Log session for debugging
 app.use((req, res, next) => {
-  console.log('Session:', req.session);
+  console.log("Session:", req.session);
   next();
 });
-
 
 // 404 fallback
 app.use((req, res) => {
   res.status(404).send("404 Not Found");
 });
 
-
 // Sync session table and database, then start server
-sessionStore
-  .sync()
-  .then(() => sequelize.sync({ force: false }))
-  .then(() => {
+(async () => {
+  try {
+    await sessionStore.sync();
+    await sequelize.sync({ force: false });
     console.log("✅ Database and session store synchronized!");
+
     const PORT = process.env.PORT || 5000;
     app.listen(PORT, () => {
       console.log(`✅ Server running at http://localhost:${PORT}`);
     });
-  })
-  .catch((error) => {
+  } catch (error) {
     console.error("❌ Error syncing the database or session store:", error);
-  });
+  }
+})();
