@@ -21,6 +21,9 @@ const sessionStore = new SequelizeStore({
 
 // Initialize express app
 const app = express();
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
