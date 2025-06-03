@@ -81,10 +81,17 @@ app.get("/admin-dashboard", (req, res) => {
   res.redirect("/admin/dashboard");
 });
 
+app.use((req, res, next) => {
+  console.log('Session:', req.session);
+  next();
+});
+
+
 // 404 fallback
 app.use((req, res) => {
   res.status(404).send("404 Not Found");
 });
+
 
 // Sync session table and database, then start server
 sessionStore
